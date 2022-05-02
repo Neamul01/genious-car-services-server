@@ -1,6 +1,7 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -21,6 +22,16 @@ async function run() {
         const serviceCollection = client.db('GeniousCar').collection('service');
         const orderCollection = client.db('GeniousCar').collection('order');
 
+        // AUTH
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.SECRET_TOKEN, {
+                expiresIn: '1d'
+            })
+            res.send({ accessToken });
+        })
+
+        //services api
         app.get('/service', async (req, res) => {
             const query = {};
             const cursor = serviceCollection.find(query);
@@ -51,6 +62,15 @@ async function run() {
         })
 
         //order collection api
+
+        app.get('/order', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const cursor = orderCollection.find(query);
+            const order = await cursor.toArray();
+            res.send(order)
+        })
+
         app.post('/order', async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
