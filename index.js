@@ -110,6 +110,10 @@ app.get('/', (req, res) => {
     res.send('Genious Server Running....!');
 })
 
+app.get('/', (req, res) => {
+    res.send('Testing server deploy...')
+})
+
 
 app.listen(port, () => {
     console.log('Genious Server Running at Port: ', port)
